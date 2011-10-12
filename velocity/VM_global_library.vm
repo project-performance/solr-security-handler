@@ -2,11 +2,14 @@
 #macro(param $key)$request.params.get($key)#end
 
 #macro(url_for_solr)/solr#if($request.core.name != "")/$request.core.name#end#end
-#macro(url_for_home)#url_for_solr/browse#end
+#macro(base_name)/auth#end
+#macro(url_for_home)#url_for_solr#base_name#end
 
 #macro(q)&q=$!{esc.url($params.get('q'))}#end
 
 #macro(user)&user=$!{esc.url($params.get('user'))}#end
+
+#macro(userName)#if($request.params.get('user'))$request.params.get('user')#end#end
 
 #macro(fqs $p)#foreach($fq in $p)#if($velocityCount>1)&#{end}fq=$esc.url($fq)#end#end
 
@@ -24,9 +27,9 @@
 
 #macro(group)#if($request.params.getBool("group") == true)&group=true#end#if($request.params.get("group.field"))#foreach($grp in $request.params.getParams('group.field'))&group.field=$grp#end#end#end
 
-#macro(lensNoQ)?#if($request.params.getParams('fq') and $list.size($request.params.getParams('fq')) > 0)&#fqs($request.params.getParams('fq'))#end#debug#boostPrice#annotate#spatial#qOpts#group#end
+#macro(lensNoQ)?#if($request.params.getParams('fq') and $list.size($request.params.getParams('fq')) > 0)&#fqs($request.params.getParams('fq').replace($request.params.getParams('ufq'), ""))#end#debug#boostPrice#annotate#spatial#qOpts#group#end
 #macro(lens)#lensNoQ#q#end
-        
+
 
 #macro(url_for_lens)#{url_for_home}#lens#end
 
